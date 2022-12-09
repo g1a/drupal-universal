@@ -39,7 +39,7 @@ class ComposerScripts {
     $composerJson['require'] = static::refineConstraints($composerJson['require'], $projectsToRefine, $composerLock);
     $composerJson['require-dev'] = static::refineConstraints($composerJson['require-dev'], $projectsToRefine, $composerLock);
 
-    file_put_contents("composer.json", json_encode($composerJson));
+    file_put_contents("composer.json", json_encode($composerJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL);
   }
 
   public static function refineConstraints($projects, $projectsToRefine, $composerLock) {
