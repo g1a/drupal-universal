@@ -25,7 +25,10 @@ class ComposerScripts {
     }
 
     $composerJsonContents = file_get_contents("composer.json");
-    $composerJson = json_decode($composerJsonContents);
+    $composerJson = json_decode($composerJsonContents, true);
+
+    $composerLockContents = file_get_contents("composer.lock");
+    $composerLock = json_decode($composerLockContents, true);
 
     if (!isset($composerJson['config']['starter']['refine-constraints'])) {
       print "we need config.starter.refine-constraints to function\n";
@@ -33,16 +36,18 @@ class ComposerScripts {
     }
 
     $projectsToRefine = $composerJson['config']['starter']['refine-constraints'];
-    $composerJson['require'] = static::refineConstraints($composerJson['require'], $projectsToRefine);
-    $composerJson['require-dev'] = static::refineConstraints($composerJson['require-dev'], $projectsToRefine);
+    $composerJson['require'] = static::refineConstraints($composerJson['require'], $projectsToRefine, $composerLock);
+    $composerJson['require-dev'] = static::refineConstraints($composerJson['require-dev'], $projectsToRefine, $composerLock);
 
-    // file_put_contents("composer.json", json_encode($composerJson));
+    file_put_contents("composer.json", json_encode($composerJson));
   }
 
-  public static function refineConstraints($projects, $projectsToRefine) {
+  public static function refineConstraints($projects, $projectsToRefine, $composerLock) {
     foreach ($projects as $project => $constraint) {
       if (static::ifProjectMatches($project, $projectsToRefine)) {
-        print "$project matches\n";
+        $versionFromLockFile = static::versionFromLockFile($project, $composerLock);
+        print "$project matches, its locked version is $versionFromLockFile\n";
+        $projects[$project] = static::constraintFromLockedVersion($versionFromLockFile);
       }
     }
 
@@ -56,6 +61,21 @@ class ComposerScripts {
       }
     }
     return false;
+  }
+
+  public static function versionFromLockFile($project, $composerLock) {
+    foreach (array_merge($composerLock['packages'], $composerLock['packages-dev']) as $package) {
+      if ($package['name'] == $project) {
+        return $package['version'];
+      }
+    }
+    return '';
+  }
+
+  public static function constraintFromLockedVersion($versionFromLockFile) {
+    $versionParts = explode('.', $versionFromLockFile);
+
+    return '^' . $versionParts[0];
   }
 
   /**
