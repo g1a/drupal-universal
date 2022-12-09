@@ -16,6 +16,48 @@ use Webmozart\PathUtil\Path;
 
 class ComposerScripts {
 
+  public static function boom(Event $event) {
+    print "boom\n";
+
+    if (!file_exists('composer.lock')) {
+      print "we need a composer.lock to work; please run 'composer install' or 'composer update'\n";
+      return;
+    }
+
+    $composerJsonContents = file_get_contents("composer.json");
+    $composerJson = json_decode($composerJsonContents);
+
+    if (!isset($composerJson['config']['starter']['refine-constraints'])) {
+      print "we need config.starter.refine-constraints to function\n";
+      return;
+    }
+
+    $projectsToRefine = $composerJson['config']['starter']['refine-constraints'];
+    $composerJson['require'] = static::refineConstraints($composerJson['require'], $projectsToRefine);
+    $composerJson['require-dev'] = static::refineConstraints($composerJson['require-dev'], $projectsToRefine);
+
+    // file_put_contents("composer.json", json_encode($composerJson));
+  }
+
+  public static function refineConstraints($projects, $projectsToRefine) {
+    foreach ($projects as $project => $constraint) {
+      if (static::ifProjectMatches($project, $projectsToRefine)) {
+        print "$project matches\n";
+      }
+    }
+
+    return $projects;
+  }
+
+  public static function ifProjectMatches($project, $projectsToRefine) {
+    foreach ($projectsToRefine as $pattern) {
+      if (preg_match("#$pattern#", $project)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   /**
    * Add a dependency to the upstream-configuration section of a custom upstream.
    *

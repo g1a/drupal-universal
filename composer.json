@@ -16,9 +16,9 @@
     "require": {
         "pantheon-upstreams/upstream-configuration": "dev-main",
         "composer/installers": "^1.9",
-        "drupal/core-composer-scaffold": "^9.2",
-        "drupal/core-recommended": "^9.2",
-        "pantheon-systems/drupal-integrations": "^9",
+        "drupal/core-composer-scaffold": "*",
+        "drupal/core-recommended": "*",
+        "pantheon-systems/drupal-integrations": "*",
         "cweagans/composer-patches": "^1.7",
         "drush/drush": "^11 || ^12"
     },
@@ -73,6 +73,9 @@
         ],
         "upstream-require": [
             "DrupalUniversal\\ComposerScripts::upstreamRequire"
+        ],
+        "boom": [
+            "DrupalUniversal\\ComposerScripts::boom"
         ]
     },
     "scripts-descriptions": {
@@ -84,7 +87,7 @@
         "platform": {
             "php": "7.4"
         },
-        "starter-config": {
+        "starter": {
             "refine-constraints": [
                 "drupal/.*",
                 "pantheon-systems/drupal-integrations",
