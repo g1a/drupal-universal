@@ -2,11 +2,11 @@
 
 There are some atypical development and release procedures in use with this repository:
  1. The currently released version of this repository lives in parallel in the `main` branche of
-    [pantheon-upstreams/drupal-composer-managed](https://github.com/pantheon-upstreams/drupal-composer-managed).  
-    `pantheon-upstreams/drupal-composer-managed` closely mirrors the development repository at [pantheon-systems/drupal-composer-managed](https://github.com/pantheon-systems/drupal-composer-managed)
+    [pantheon-upstreams/drupal-universal](https://github.com/pantheon-upstreams/drupal-universal).  
+    `pantheon-upstreams/drupal-universal` closely mirrors the development repository at [pantheon-systems/drupal-universal](https://github.com/pantheon-systems/drupal-universal)
     and is automatically updated by a CircleCI process.
- 1. Changes are made by submitting a PR against the `default` branch of `pantheon-systems/drupal-composer-managed`.
- 1. Merging a PR to `default` _does not_ create a new release of `pantheon-upstreams/drupal-composer-managed`. This allows us to
+ 1. Changes are made by submitting a PR against the `default` branch of `pantheon-systems/drupal-universal`.
+ 1. Merging a PR to `default` _does not_ create a new release of `pantheon-upstreams/drupal-universal`. This allows us to
     batch more than one relatively small change into a single new "release" such that the number of separate update
     events appearing on customer dashboards is more controlled.
 

@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \DrupalComposerManaged\ComposerScripts.
+ * Contains \DrupalUniversal\ComposerScripts.
  */
 
-namespace DrupalComposerManaged;
+namespace DrupalUniversal;
 
 use Composer\Script\Event;
 use Composer\Semver\Comparator;
@@ -43,7 +43,7 @@ class ComposerScripts {
     // Refuse to run if:
     //   - This is a clone of the standard Pantheon upstream, and it hasn't been renamed
     //   - This is an local working copy of a Pantheon site instread of the upstream
-    $isPantheonStandardUpstream = (strpos($name, 'pantheon-systems/drupal-composer-managed') !== false);
+    $isPantheonStandardUpstream = (strpos($name, 'pantheon-systems/drupal-universal') !== false);
     $isPantheonSite = (strpos($gitRepoUrl, '@codeserver') !== false);
 
     if ($isPantheonStandardUpstream || $isPantheonSite) {

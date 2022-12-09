@@ -1,5 +1,5 @@
 {
-    "name": "pantheon-upstreams/drupal-composer-managed",
+    "name": "pantheon-upstreams/drupal-universal",
     "description": "Install Drupal 9 with Composer on Pantheon.",
     "type": "project",
     "license": "MIT",
@@ -69,10 +69,10 @@
     },
     "scripts": {
         "pre-update-cmd": [
-            "DrupalComposerManaged\\ComposerScripts::preUpdate"
+            "DrupalUniversal\\ComposerScripts::preUpdate"
         ],
         "upstream-require": [
-            "DrupalComposerManaged\\ComposerScripts::upstreamRequire"
+            "DrupalUniversal\\ComposerScripts::upstreamRequire"
         ]
     },
     "scripts-descriptions": {
@@ -83,6 +83,13 @@
         "sort-packages": false,
         "platform": {
             "php": "7.4"
+        },
+        "starter-config": {
+            "refine-constraints": [
+                "drupal/.*",
+                "pantheon-systems/drupal-integrations",
+                "drush/drush"
+            ]
         },
         "allow-plugins": {
             "composer/installers": true,
