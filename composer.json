@@ -16,14 +16,14 @@
     "require": {
         "pantheon-upstreams/upstream-configuration": "dev-main",
         "composer/installers": "^1.9",
-        "drupal/core-composer-scaffold": "*",
-        "drupal/core-recommended": "*",
-        "pantheon-systems/drupal-integrations": "*",
+        "drupal/core-composer-scaffold": ">=8@stable",
+        "drupal/core-recommended": ">=8@stable",
+        "pantheon-systems/drupal-integrations": ">=8@stable",
         "cweagans/composer-patches": "^1.7",
         "drush/drush": "^11 || ^12"
     },
     "require-dev": {
-        "drupal/core-dev": "^9.2"
+        "drupal/core-dev": ">=8@stable"
     },
     "conflict": {
         "drupal/drupal": "*"
