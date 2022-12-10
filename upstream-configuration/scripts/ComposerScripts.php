@@ -30,6 +30,8 @@ class ComposerScripts {
       return;
     }
 
+    print "Configuring starter project\n";
+
     $composerLockContents = file_get_contents("composer.lock");
     $composerLock = json_decode($composerLockContents, true);
 
@@ -49,8 +51,9 @@ class ComposerScripts {
     foreach ($projects as $project => $constraint) {
       if (static::ifProjectMatches($project, $projectsToRefine)) {
         $versionFromLockFile = static::versionFromLockFile($project, $composerLock);
-        print "$project matches, its locked version is $versionFromLockFile\n";
-        $projects[$project] = static::constraintFromLockedVersion($versionFromLockFile);
+        $refinedConstraint = static::constraintFromLockedVersion($versionFromLockFile);
+        print "  - $project: $refinedConstraint\n";
+        $projects[$project] = $refinedConstraint;
       }
     }
 
