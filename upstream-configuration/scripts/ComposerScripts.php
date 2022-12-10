@@ -16,29 +16,32 @@ use Webmozart\PathUtil\Path;
 
 class ComposerScripts {
 
-  public static function boom(Event $event) {
-    print "boom\n";
+  public static function starterProjectConfiguration(Event $event) {
+    $composerJsonContents = file_get_contents("composer.json");
+    $composerJson = json_decode($composerJsonContents, true);
+
+    // Silently exit if we do not have any starter configuration
+    if (!isset($composerJson['config']['starter']['refine-constraints'])) {
+      return;
+    }
 
     if (!file_exists('composer.lock')) {
       print "we need a composer.lock to work; please run 'composer install' or 'composer update'\n";
       return;
     }
 
-    $composerJsonContents = file_get_contents("composer.json");
-    $composerJson = json_decode($composerJsonContents, true);
-
     $composerLockContents = file_get_contents("composer.lock");
     $composerLock = json_decode($composerLockContents, true);
 
-    if (!isset($composerJson['config']['starter']['refine-constraints'])) {
-      print "we need config.starter.refine-constraints to function\n";
-      return;
-    }
-
+    // Refine the constraints
     $projectsToRefine = $composerJson['config']['starter']['refine-constraints'];
     $composerJson['require'] = static::refineConstraints($composerJson['require'], $projectsToRefine, $composerLock);
     $composerJson['require-dev'] = static::refineConstraints($composerJson['require-dev'], $projectsToRefine, $composerLock);
 
+    // Remove the starter configuration; we only do this once
+    unset($composerJson['config']['starter']);
+
+    // Write the modified composer.json file
     file_put_contents("composer.json", json_encode($composerJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL);
   }
 

@@ -26,7 +26,7 @@
         "drupal/core-dev": "^9.2"
     },
     "conflict": {
-            "drupal/drupal": "*"
+        "drupal/drupal": "*"
     },
     "minimum-stability": "stable",
     "prefer-stable": true,
@@ -71,11 +71,11 @@
         "pre-update-cmd": [
             "DrupalUniversal\\ComposerScripts::preUpdate"
         ],
+        "post-update-cmd": [
+            "DrupalUniversal\\ComposerScripts::starterProjectConfiguration"
+        ],
         "upstream-require": [
             "DrupalUniversal\\ComposerScripts::upstreamRequire"
-        ],
-        "boom": [
-            "DrupalUniversal\\ComposerScripts::boom"
         ]
     },
     "scripts-descriptions": {
