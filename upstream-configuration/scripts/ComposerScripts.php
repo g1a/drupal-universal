@@ -16,7 +16,37 @@ use Webmozart\PathUtil\Path;
 
 class ComposerScripts {
 
-  public static function starterProjectConfiguration(Event $event) {
+  /**
+   * postUpdate
+   *
+   * After "composer update" runs, we have the opportunity to do additional
+   * fixups to the project files.
+   *
+   * @param Composer\Script\Event $event
+   *   The Event object passed in from Composer
+   */
+  public static function postUpdate(Event $event) {
+    static::starterProjectConfiguration();
+  }
+
+  /**
+   * starterProjectConfiguration
+   *
+   * If the top-level composer.json file has a config.starter element, then
+   * we will do one-time project configuration to set things up for continuing
+   * development. At the moment, there is ony one supported starter
+   * configuration optoion: refine the starting project constraints.
+   *
+   * The 'refine-constraints' element contains a list of regular expressions
+   * matching prjoects in the "require" or "require-dev" sections of the
+   * composer.json file. Any matching project with a flexible major release
+   * constraint will be rewritten to instead constrain to whatever major
+   * version of that component was installed. For example, if Drupal is
+   * constrained to version `*` (any version), and Drupal 9 is installed, then
+   * the constraint will be updated to ^9. This keeps the site on Drupal 9
+   * until the site owner modifies the composer.json file to allos Drupal 10.
+   */
+  public static function starterProjectConfiguration() {
     $composerJsonContents = file_get_contents("composer.json");
     $composerJson = json_decode($composerJsonContents, true);
 
@@ -44,12 +74,46 @@ class ComposerScripts {
     unset($composerJson['config']['starter']);
 
     // Write the modified composer.json file
-    file_put_contents("composer.json", json_encode($composerJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL);
+    $composerJsonContents = static::jsonEncodePretty($composerJson);
+    file_put_contents("composer.json", $composerJsonContents . PHP_EOL);
   }
 
+  /**
+   * jsonEncodePretty
+   *
+   * Convert a nested array into a pretty-printed json-encoded string.
+   *
+   * @param array $data
+   *   The data array to encode
+   * @return string
+   *   The pretty-printed encoded string version of the supplied data.
+   */
+  public static function jsonEncodePretty($data) {
+    $prettyContents = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    $prettyContents = preg_replace('#": \[\s*("[^"]*")\s*\]#m', '": [\1]', $prettyContents);
+
+    return $prettyContents;
+  }
+
+  /**
+   * refineConstraints
+   *
+   * Alter the version constraints of a list of projects based on the current
+   * composer.lock data.
+   *
+   * @param array $projects
+   *   A mapping from a project name (e.g. "drupal/core-recommended") to its
+   *   version constraint.
+   * @param array $projectsToRefine
+   *   A list of project names (or regular expressions) of projects to modify.
+   * @param array $composerLock
+   *   Contents of the composer.lock file.
+   * @return array
+   *   The $projects input array with altered version constriants where stipulated
+   */
   public static function refineConstraints($projects, $projectsToRefine, $composerLock) {
     foreach ($projects as $project => $constraint) {
-      if (static::ifProjectMatches($project, $projectsToRefine)) {
+      if (static::isMatchingProject($project, $projectsToRefine)) {
         $versionFromLockFile = static::versionFromLockFile($project, $composerLock);
         $refinedConstraint = static::constraintFromLockedVersion($versionFromLockFile);
         print "  - $project: $refinedConstraint\n";
@@ -60,7 +124,20 @@ class ComposerScripts {
     return $projects;
   }
 
-  public static function ifProjectMatches($project, $projectsToRefine) {
+  /**
+   * isMatchingProject
+   *
+   * Determines if the specified project matches any of a series of project
+   * regexs.
+   *
+   * @param string $project
+   *   A project name, e.g. "drupal/core-recommended"
+   * @param array $projectsToRefine
+   *   A list of project names (or regular expressions) of projects to modify.
+   * @return bool
+   *   'true' if $project matches any regex in $projectsToRefine
+   */
+  public static function isMatchingProject($project, $projectsToRefine) {
     foreach ($projectsToRefine as $pattern) {
       if (preg_match("#$pattern#", $project)) {
         return true;
@@ -69,6 +146,20 @@ class ComposerScripts {
     return false;
   }
 
+  /**
+   * versionFromLockFile
+   *
+   * Look up the version that the specified project was installed at per the
+   * data in the current composer.lock file.
+   *
+   * @param string $project
+   *   A project name, e.g. "drupal/core-recommended"
+   * @param array $composerLock
+   *   Contents of the composer.lock file.
+   * @return string
+   *   Installed version of the requested project from the lock file data,
+   *   or an empty string if not found.
+   */
   public static function versionFromLockFile($project, $composerLock) {
     foreach (array_merge($composerLock['packages'], $composerLock['packages-dev']) as $package) {
       if ($package['name'] == $project) {
@@ -78,6 +169,17 @@ class ComposerScripts {
     return '';
   }
 
+  /**
+   * constraintFromLockedVersion
+   *
+   * Convert from an installed version number to a version constraint
+   *
+   * @param string $versionFromLockFile
+   *   A semver version from the lock file, e.g '9.4.9'
+   * @return string
+   *   Corresponding version constraint locked on the major version only,
+   *   e.g. '^9'
+   */
   public static function constraintFromLockedVersion($versionFromLockFile) {
     $versionParts = explode('.', $versionFromLockFile);
 

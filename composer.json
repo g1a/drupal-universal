@@ -35,9 +35,7 @@
             "locations": {
                 "web-root": "./web"
             },
-            "allowed-packages": [
-                "pantheon-systems/drupal-integrations"
-            ],
+            "allowed-packages": ["pantheon-systems/drupal-integrations"],
             "file-mapping": {
                 "[project-root]/.editorconfig": false,
                 "[project-root]/pantheon.upstream.yml": false,
@@ -63,20 +61,12 @@
         }
     },
     "autoload": {
-        "classmap": [
-            "upstream-configuration/scripts/ComposerScripts.php"
-        ]
+        "classmap": ["upstream-configuration/scripts/ComposerScripts.php"]
     },
     "scripts": {
-        "pre-update-cmd": [
-            "DrupalUniversal\\ComposerScripts::preUpdate"
-        ],
-        "post-update-cmd": [
-            "DrupalUniversal\\ComposerScripts::starterProjectConfiguration"
-        ],
-        "upstream-require": [
-            "DrupalUniversal\\ComposerScripts::upstreamRequire"
-        ]
+        "pre-update-cmd": ["DrupalUniversal\\ComposerScripts::preUpdate"],
+        "post-update-cmd": ["DrupalUniversal\\ComposerScripts::postUpdate"],
+        "upstream-require": ["DrupalUniversal\\ComposerScripts::upstreamRequire"]
     },
     "scripts-descriptions": {
         "upstream-require": "Add a dependency to an upstream. See https://pantheon.io/docs/create-custom-upstream for information on creating custom upstreams."
@@ -90,8 +80,7 @@
         "starter": {
             "refine-constraints": [
                 "drupal/.*",
-                "pantheon-systems/drupal-integrations",
-                "drush/drush"
+                "pantheon-systems/drupal-integrations"
             ]
         },
         "allow-plugins": {
