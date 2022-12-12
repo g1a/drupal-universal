@@ -44,7 +44,7 @@ class ComposerScripts {
    * version of that component was installed. For example, if Drupal is
    * constrained to version `*` (any version), and Drupal 9 is installed, then
    * the constraint will be updated to ^9. This keeps the site on Drupal 9
-   * until the site owner modifies the composer.json file to allos Drupal 10.
+   * until the site owner modifies the composer.json file to allow Drupal 10.
    */
   public static function starterProjectConfiguration() {
     $composerJsonContents = file_get_contents("composer.json");
